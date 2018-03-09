@@ -18,7 +18,7 @@ class Client
     /**
      * @return string
      */
-    public function getEndPoint(): string
+    private function getEndPoint(): string
     {
         return $this->endPoint;
     }
@@ -27,7 +27,7 @@ class Client
      * @param string $endPoint
      * @return Client
      */
-    public function setEndPoint(string $endPoint): Client
+    private function setEndPoint(string $endPoint): Client
     {
         $this->endPoint = $endPoint;
         return $this;
@@ -36,7 +36,7 @@ class Client
     /**
      * @return mixed
      */
-    public function getToken()
+    private function getToken()
     {
         return $this->token;
     }
@@ -45,7 +45,7 @@ class Client
      * @param mixed $token
      * @return Client
      */
-    public function setToken($token)
+    private function setToken($token)
     {
         $this->token = $token;
         return $this;
@@ -54,7 +54,7 @@ class Client
     /**
      * @return GuzzleClient
      */
-    public function getHttpClient(): GuzzleClient
+    private function getHttpClient(): GuzzleClient
     {
         return $this->httpClient;
     }
@@ -63,13 +63,13 @@ class Client
      * @param GuzzleClient $httpClient
      * @return Client
      */
-    public function setHttpClient(GuzzleClient $httpClient): Client
+    private function setHttpClient(GuzzleClient $httpClient): Client
     {
         $this->httpClient = $httpClient;
         return $this;
     }
 
-    private $token;
+    private $token = null;
     private $httpClient;
 
     public function __construct( $sandBox = false )
@@ -109,9 +109,25 @@ class Client
     }
 
     /**
+     * @return bool
+     */
+    public function isLogged(): bool
+    {
+        return !is_null( $this->getToken() );
+    }
+
+    /**
+     *
+     */
+    public function logout(): void
+    {
+        $this->setToken( null );
+    }
+
+    /**
      * @return array
      */
-    public function getViews() : array
+    private function getViews() : array
     {
         $r = $this
             ->getHttpClient()
@@ -125,11 +141,55 @@ class Client
             );
 
         if ( $r->getStatusCode() == 200 ) {
+            return json_decode( $r->getBody(), true )[0]['views_available'];
+        } else {
+
+            throw new Exception( $r->getBody(), $r->getStatusCode() );
+        }
+    }
+
+    /**
+     * @return array
+     */
+    private function getAccounts( string $view ) : array
+    {
+        $r = $this
+            ->getHttpClient()
+            ->get(
+                'banks/322/accounts/'.$view,
+                [
+                    'headers' => [
+                        'Authorization' => 'JWT '.$this->getToken(),
+                    ]
+                ]
+            );
+
+        if ( $r->getStatusCode() == 200 ) {
 
             return json_decode( $r->getBody(), true );
         } else {
 
             throw new Exception( $r->getBody(), $r->getStatusCode() );
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param array $arguments
+     */
+    public function __call( string $name, array $arguments )
+    {
+        if ( is_callable( [ $this, $name  ] ) ) {
+            if ( $this->isLogged() ) {
+
+                return call_user_func_array( [ $this, $name ], $arguments );
+            } else {
+
+                throw new Exception('You must be logged in before calling '.$name);
+            }
+        } else {
+
+            throw new Exception('Unknown method '.$name);
         }
     }
 }

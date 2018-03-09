@@ -23,7 +23,13 @@ try {
     );
     echo 'Login succesful'.PHP_EOL;
     $views = $client->getViews();
-    print_r($views);
+    foreach ( $views as $view ) {
+        print_r( $view );
+        echo 'Getting accounts for view '.$view['id'].PHP_EOL;
+        $accounts = $client->getAccounts( $view['id'] );
+        print_r($accounts);
+
+    }
 } catch ( Exception $e ) {
     echo $e->getMessage().PHP_EOL;
 }
