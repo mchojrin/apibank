@@ -1,0 +1,21 @@
+{
+  "name": "leeway/apibank-sdk",
+  "description": "SDK para la API Bank del Bind. Mas informacion en https://apibank.pcnt.io/apidoc/",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Mauro Chojrin",
+      "email": "mauro.chojrin@leewayweb.com"
+    }
+  ],
+  "require": {
+    "guzzlehttp/guzzle": "6.3.0",
+    "php" : ">= 7.2.0"
+  },
+  "autoload": {
+    "psr-0": {
+      "Leeway" : "src/"
+    }
+  }
+}
