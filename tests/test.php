@@ -6,7 +6,7 @@
  * Time: 9:23 PM
  */
 
-require_once '../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 use \Leeway\APIBank\Client as Client;
 
@@ -22,6 +22,8 @@ try {
         'WYGc1Jus0LLexuQ'
     );
     echo 'Login succesful'.PHP_EOL;
+    $views = $client->getViews();
+    print_r($views);
 } catch ( Exception $e ) {
-    echo $e->getMessage();
+    echo $e->getMessage().PHP_EOL;
 }

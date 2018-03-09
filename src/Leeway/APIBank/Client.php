@@ -107,4 +107,29 @@ class Client
             throw new Exception( $r->getBody(), $r->getStatusCode() );
         }
     }
+
+    /**
+     * @return array
+     */
+    public function getViews() : array
+    {
+        $r = $this
+            ->getHttpClient()
+            ->get(
+                'banks/322/accounts',
+                [
+                    'headers' => [
+                        'Authorization' => 'JWT '.$this->getToken(),
+                    ]
+                ]
+            );
+
+        if ( $r->getStatusCode() == 200 ) {
+
+            return json_decode( $r->getBody(), true );
+        } else {
+
+            throw new Exception( $r->getBody(), $r->getStatusCode() );
+        }
+    }
 }
